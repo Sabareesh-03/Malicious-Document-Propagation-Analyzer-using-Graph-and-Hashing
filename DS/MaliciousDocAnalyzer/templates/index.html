@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malicious Document Propagation Analyzer using Graph and Hashing</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="sidebar-title">DocAnalyzer</h2>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-item active" onclick="showSection('dashboard')">Dashboard</a></li>
+            <li><a href="#" class="nav-item" onclick="showSection('document-analysis')">Document Analysis</a></li>
+            <li><a href="#" class="nav-item" onclick="showSection('device-management')">Device Management</a></li>
+            <li><a href="#" class="nav-item" onclick="showSection('propagation-graph')">Propagation Investigation</a></li>
+            <li><a href="#" class="nav-item" onclick="showSection('incident-history')">Investigation Timeline</a></li>
+            <li><a href="#" class="nav-item" onclick="showSection('search')">Investigation Search</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <header class="top-header">
+            <h1>Malicious Document Propagation Analyzer using Graph and Hashing</h1>
+            <p class="subtitle">Security analysis simulation using underlying data structures.</p>
+        </header>
+
+        <!-- Dashboard Section -->
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section active">
+            
+            <div class="panel" style="margin-bottom: 25px; border-left: 4px solid #ff4d4d; background: linear-gradient(90deg, #1e1e1e 0%, #121212 100%);">
+                <h3 style="color: #ffffff; margin-bottom: 8px; font-size: 20px;">System Overview</h3>
+                <p style="color: #cccccc;"><strong>Project:</strong> Malicious Document Propagation Analyzer using Graph and Hashing</p>
+                <p style="color: #999999; margin-top: 5px; font-size: 14px;"><strong>Purpose:</strong> Analyze suspicious document propagation using hashing and graph-based device relationships.</p>
+            </div>
+
+            <h2 style="font-size: 18px; color: #aaaaaa; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Security Overview</h2>
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Total Documents</h3>
+                    <p class="placeholder-value" id="stat-total-docs">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Documents currently analyzed</p>
+                </div>
+                <div class="card">
+                    <h3>Unique Hashes</h3>
+                    <p class="placeholder-value" id="stat-unique-hashes">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Distinct document fingerprints</p>
+                </div>
+                <div class="card suspicious-card">
+                    <h3 style="color: #ff4d4d;">Suspicious Documents</h3>
+                    <p class="placeholder-value" id="stat-suspicious-docs">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Documents requiring investigation</p>
+                </div>
+                <div class="card">
+                    <h3>Connected Devices</h3>
+                    <p class="placeholder-value" id="stat-connected-devices">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Devices in the propagation network</p>
+                </div>
+                <div class="card">
+                    <h3>Propagation Connections</h3>
+                    <p class="placeholder-value" id="stat-prop-connections">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Device relationships being analyzed</p>
+                </div>
+                <div class="card">
+                    <h3>Total Incidents</h3>
+                    <p class="placeholder-value" id="stat-total-incidents">--</p>
+                    <p style="font-size: 11px; color: #777; margin-top: 8px;">Recorded propagation incidents</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 25px;">
+                <!-- Recent Suspicious Activity -->
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Recent Suspicious Activity</h3>
+                    <div id="dashboard-recent-activity" style="max-height: 250px; overflow-y: auto;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Propagation Status -->
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Propagation Status</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <span style="color: #aaaaaa; font-size: 12px; text-transform: uppercase;">Repeated Hashes</span>
+                            <div id="status-repeated-hashes" style="font-size: 20px; font-weight: bold; color: #ff4d4d;">--</div>
+                        </div>
+                        <div>
+                            <span style="color: #aaaaaa; font-size: 12px; text-transform: uppercase;">Suspicious Documents</span>
+                            <div id="status-suspicious-docs" style="font-size: 20px; font-weight: bold; color: #ff4d4d;">--</div>
+                        </div>
+                        <div>
+                            <span style="color: #aaaaaa; font-size: 12px; text-transform: uppercase;">Investigation Required</span>
+                            <div id="status-investigation-req" style="font-size: 20px; font-weight: bold; color: #ff4d4d;">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Document Analysis Section -->
+        <div id="document-analysis" class="section">
+            <h2 style="font-size: 24px; color: #ffffff; text-transform: uppercase; margin-bottom: 5px;">Document Analysis</h2>
+            <p style="color: #999999; margin-bottom: 25px;">Analyze document fingerprints and identify repeated files requiring investigation.</p>
+            
+            <div class="cards-container" style="margin-bottom: 20px;">
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Total Documents</h3>
+                    <p class="placeholder-value" id="doc-stat-total">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Unique Hashes</h3>
+                    <p class="placeholder-value" id="doc-stat-unique">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Repeated Hashes</h3>
+                    <p class="placeholder-value" id="doc-stat-repeated">--</p>
+                </div>
+                <div class="card suspicious-card">
+                    <h3 style="font-size: 12px; color: #ff4d4d;">Docs Requiring Investigation</h3>
+                    <p class="placeholder-value" id="doc-stat-investigation" style="color: #ff4d4d;">--</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Register Document</h3>
+                    <div class="input-group" style="flex-direction: column; align-items: stretch;">
+                        <input type="text" id="doc-name-input" placeholder="Document Name" class="placeholder-input" style="width: 100%; margin-bottom: 10px;">
+                        <input type="text" id="doc-hash-input" placeholder="File Hash" class="placeholder-input" style="width: 100%; margin-bottom: 10px;">
+                        <button class="placeholder-btn" onclick="addDocument()" style="width: 100%;">Register Document</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 5px;">Search Document Fingerprint</h3>
+                    <p style="color: #888; font-size: 12px; margin-bottom: 15px;">Find all documents associated with a specific hash value.</p>
+                    <div class="input-group">
+                        <input type="text" id="search-hash-input" placeholder="Enter document hash..." class="placeholder-input" style="flex: 1;">
+                        <button class="placeholder-btn" onclick="searchDocumentHash()">Search</button>
+                    </div>
+                    <div id="search-results-area" style="display:none; margin-top: 15px;">
+                        <!-- Search results appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 15px;">Analyzed Documents</h3>
+                <div style="overflow-x: auto;">
+                    <table class="placeholder-table" id="doc-hash-table">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Fingerprint</th>
+                                <th>Status</th>
+                                <th>Occurrences</th>
+                                <th>Investigation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top: 20px; background: #151515; border: 1px dashed #333;">
+                <h4 style="color: #888; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Technical Implementation</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 13px; color: #aaa;">
+                    <div><strong style="color:#ccc;">Hash Table</strong><br>Stores document fingerprints for efficient lookup.</div>
+                    <div><strong style="color:#ccc;">Hashing</strong><br>Converts document information into a searchable fingerprint.</div>
+                    <div><strong style="color:#ccc;">Collision Handling</strong><br>Existing HashNode/chaining implementation is retained.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Management Section -->
+        <div id="device-management" class="section">
+            <h2>Device Management</h2>
+            <div class="panel">
+                <h3>Add Device</h3>
+                <div class="input-group">
+                    <input type="text" id="dev-id-input" placeholder="Device ID (e.g. D5)" class="placeholder-input">
+                    <input type="text" id="dev-name-input" placeholder="Device Name" class="placeholder-input">
+                    <button class="placeholder-btn" onclick="uiAddDevice()">Add Device</button>
+                </div>
+                <div id="dev-msg-area" style="margin-top: 10px; color: #ff4d4d; font-size: 14px;"></div>
+            </div>
+
+            <div class="panel" style="margin-top: 20px;">
+                <h3>Add Connection</h3>
+                <div class="input-group">
+                    <input type="text" id="conn-src-input" placeholder="Source Device (e.g. D1)" class="placeholder-input">
+                    <input type="text" id="conn-dest-input" placeholder="Dest Device (e.g. D2)" class="placeholder-input">
+                    <button class="placeholder-btn" onclick="uiAddConnection()">Add Connection</button>
+                </div>
+                <div id="conn-msg-area" style="margin-top: 10px; color: #ff4d4d; font-size: 14px;"></div>
+            </div>
+
+            <div class="panel" style="margin-top: 20px;">
+                <h3>Devices</h3>
+                <table class="placeholder-table" id="devices-table">
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Device Name</th>
+                            <th>Connections</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Propagation Graph Section -->
+        <div id="propagation-graph" class="section">
+            <h2 style="font-size: 24px; color: #ffffff; text-transform: uppercase; margin-bottom: 5px;">Propagation Investigation</h2>
+            <p style="color: #999999; margin-bottom: 25px;">Analyze possible document propagation paths across connected devices.</p>
+            
+            <div class="cards-container" style="margin-bottom: 20px;">
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Connected Devices</h3>
+                    <p class="placeholder-value" id="prop-stat-devices">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Propagation Connections</h3>
+                    <p class="placeholder-value" id="prop-stat-connections">--</p>
+                </div>
+                <div class="card suspicious-card">
+                    <h3 style="font-size: 12px; color: #ff4d4d;">Docs Under Investigation</h3>
+                    <p class="placeholder-value" id="prop-stat-docs" style="color: #ff4d4d;">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Available Trace Methods</h3>
+                    <p class="placeholder-value" style="font-size: 20px;">BFS + DFS</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Document Context -->
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Document Propagation Context</h3>
+                    <div id="prop-context-area" style="font-size: 13px;">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+
+                <!-- Device Network Visualization -->
+                <div class="panel">
+                    <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Device Network</h3>
+                    <div id="graph-vis-area" style="background: #121212; border: 1px solid #333; border-radius: 4px; padding: 15px; font-family: monospace; white-space: pre-wrap; font-size: 14px; min-height: 150px; color: #ccc;">
+                        <!-- Graph Vis -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Propagation Trace Controls</h3>
+                <div class="input-group" style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 5px;">Start Device</label>
+                        <select id="trace-start-device" class="placeholder-input" style="width: 100%;">
+                            <!-- JS populated -->
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 5px;">Trace Method</label>
+                        <select id="trace-method" class="placeholder-input" style="width: 100%;">
+                            <option value="BFS">BFS</option>
+                            <option value="DFS">DFS</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: flex-end;">
+                        <button class="placeholder-btn" onclick="runPropagationTrace()" style="width: 100%;">Run Propagation Trace</button>
+                    </div>
+                </div>
+                
+                <div id="trace-result-area" class="results-area" style="display:none; margin-top: 20px;">
+                    <!-- Results populated by JS -->
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="panel" style="background: #151515; border: 1px solid #222;">
+                    <h3 style="color: #ffffff; font-size: 14px; margin-bottom: 10px;">BFS</h3>
+                    <ul style="color: #aaaaaa; font-size: 13px; padding-left: 20px; margin: 0; line-height: 1.6;">
+                        <li>Level-by-level traversal</li>
+                        <li>Uses Queue</li>
+                        <li>Useful for discovering nearby connected devices</li>
+                    </ul>
+                </div>
+                <div class="panel" style="background: #151515; border: 1px solid #222;">
+                    <h3 style="color: #ffffff; font-size: 14px; margin-bottom: 10px;">DFS</h3>
+                    <ul style="color: #aaaaaa; font-size: 13px; padding-left: 20px; margin: 0; line-height: 1.6;">
+                        <li>Depth-oriented traversal</li>
+                        <li>Uses recursion</li>
+                        <li>Useful for exploring deeper connected paths</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel" style="background: #151515; border: 1px dashed #333;">
+                <h4 style="color: #888; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Propagation Analysis Engine</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 13px; color: #aaa;">
+                    <div><strong style="color:#ccc;">Graph Model</strong><br>Adjacency List</div>
+                    <div><strong style="color:#ccc;">BFS</strong><br>Queue-based traversal</div>
+                    <div><strong style="color:#ccc;">DFS</strong><br>Recursive traversal</div>
+                    <div><strong style="color:#ccc;">Graph Purpose</strong><br>Represents connected devices for possible propagation analysis</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident History Section -->
+        <div id="incident-history" class="section">
+            <h2 style="font-size: 24px; color: #ffffff; text-transform: uppercase; margin-bottom: 5px;">Investigation Timeline</h2>
+            <p style="color: #999999; margin-bottom: 25px;">Review suspicious document propagation events recorded during analysis.</p>
+            
+            <div class="cards-container" style="margin-bottom: 20px;">
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Total Incidents</h3>
+                    <p class="placeholder-value" id="inc-stat-total">--</p>
+                </div>
+                <div class="card suspicious-card">
+                    <h3 style="font-size: 12px; color: #ff4d4d;">Suspicious Incidents</h3>
+                    <p class="placeholder-value" id="inc-stat-suspicious" style="color: #ff4d4d;">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Investigations Required</h3>
+                    <p class="placeholder-value" id="inc-stat-req">--</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 12px; color: #888;">Documents Involved</h3>
+                    <p class="placeholder-value" id="inc-stat-docs">--</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Left Column: Search & Add -->
+                <div>
+                    <div class="panel" style="margin-bottom: 20px;">
+                        <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Find Investigation Record</h3>
+                        <div class="input-group" style="flex-direction: column; gap: 10px;">
+                            <input type="text" id="search-inc-input" placeholder="Incident ID (e.g. INC002)" class="placeholder-input" style="width: 100%;">
+                            <button class="placeholder-btn" onclick="uiSearchIncident()" style="width: 100%;">Search Incident</button>
+                        </div>
+                        <div id="search-inc-result" class="results-area" style="display:none; margin-top: 15px;">
+                            <!-- Result appears here -->
+                        </div>
+                    </div>
+                    
+                    <div class="panel">
+                        <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Record Investigation</h3>
+                        <div class="input-group" style="flex-direction: column; gap: 10px;">
+                            <input type="text" id="inc-id-input" placeholder="Incident ID" class="placeholder-input" style="width: 100%;">
+                            <input type="text" id="inc-doc-input" placeholder="Document Name" class="placeholder-input" style="width: 100%;">
+                            <input type="text" id="inc-hash-input" placeholder="Hash" class="placeholder-input" style="width: 100%;">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inc-src-input" placeholder="Source" class="placeholder-input" style="width: 100%;">
+                                <input type="text" id="inc-dest-input" placeholder="Dest" class="placeholder-input" style="width: 100%;">
+                            </div>
+                            <select id="inc-status-input" class="placeholder-input" style="width: 100%;">
+                                <option value="Suspicious">Suspicious</option>
+                                <option value="Needs Investigation">Needs Investigation</option>
+                            </select>
+                            <button class="placeholder-btn" onclick="uiAddIncident()" style="width: 100%;">Record Investigation</button>
+                        </div>
+                        <div id="inc-msg-area" style="margin-top: 10px; color: #ff4d4d; font-size: 13px;"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Timeline & LL -->
+                <div>
+                    <div class="panel" style="margin-bottom: 20px;">
+                        <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Investigation Timeline</h3>
+                        
+                        <div id="incident-timeline-area">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="panel" style="background: #1a1a1a;">
+                        <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Linked List Structure</h3>
+                        <p style="color: #888; font-size: 13px; margin-bottom: 15px;">Each incident is stored as a node and linked to the next incident using the next pointer.</p>
+                        <div id="ll-visualization" style="font-family: monospace; color: #cccccc; font-size: 16px; background: #121212; padding: 15px; border-radius: 4px; border: 1px dashed #444; overflow-x: auto;">
+                            <!-- Visualization here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="background: #151515; border: 1px dashed #333;">
+                <h4 style="color: #888; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Investigation Record Engine</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 13px; color: #aaa;">
+                    <div><strong style="color:#ccc;">Data Structure</strong><br>Singly Linked List</div>
+                    <div><strong style="color:#ccc;">Node</strong><br>IncidentNode</div>
+                    <div><strong style="color:#ccc;">Connection</strong><br>next pointer</div>
+                    <div><strong style="color:#ccc;">Operations</strong><br>Insert, Search, Delete, Display</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div id="search" class="section">
+            <h2 style="font-size: 24px; color: #ffffff; text-transform: uppercase; margin-bottom: 5px;">Investigation Search</h2>
+            <p style="color: #999999; margin-bottom: 25px;">Search documents, devices, and investigation records across the analysis system.</p>
+            
+            <div class="panel" style="margin-bottom: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px;">Search Engine Overview</h3>
+                <div style="display: flex; gap: 20px; font-size: 13px; color: #aaa; margin-bottom: 15px;">
+                    <div><strong style="color: #ccc;">Searchable Sources:</strong></div>
+                    <div>&bull; Documents</div>
+                    <div>&bull; Devices</div>
+                    <div>&bull; Investigation Records</div>
+                </div>
+                <div style="color: #888; font-size: 13px;">Use a document hash, document name, device ID, or incident ID to locate related analysis records.</div>
+            </div>
+
+            <div class="panel" style="margin-bottom: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">Search Control</h3>
+                <div class="input-group" style="display: flex; gap: 15px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 5px;">Search Type</label>
+                        <select id="global-search-type" class="placeholder-input" style="width: 100%;">
+                            <option value="hash">Document Hash</option>
+                            <option value="name">Document Name</option>
+                            <option value="device">Device ID</option>
+                            <option value="incident">Incident ID</option>
+                        </select>
+                    </div>
+                    <div style="flex: 2;">
+                        <label style="display: block; color: #888; font-size: 12px; margin-bottom: 5px;">Search Query</label>
+                        <input type="text" id="global-search-input" placeholder="Enter search value" class="placeholder-input" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <button class="placeholder-btn" onclick="globalSearch()" style="width: 100%;">Search Investigation</button>
+                    </div>
+                </div>
+                
+                <div id="global-search-result" class="results-area" style="display:none; margin-top: 20px;">
+                    <!-- Result appears here -->
+                </div>
+            </div>
+
+            <div class="panel" style="background: #151515; border: 1px dashed #333;">
+                <h4 style="color: #888; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Search Operation Mapping</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 13px; color: #aaa;">
+                    <div><strong style="color:#ccc;">Document Hash</strong> &rarr; Hash Table</div>
+                    <div><strong style="color:#ccc;">Document Name</strong> &rarr; Hash Table</div>
+                    <div><strong style="color:#ccc;">Device ID</strong> &rarr; Graph / Adjacency List</div>
+                    <div><strong style="color:#ccc;">Incident ID</strong> &rarr; Singly Linked List</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
